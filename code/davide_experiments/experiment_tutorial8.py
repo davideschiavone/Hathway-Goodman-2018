@@ -40,6 +40,10 @@ input_samples[1,:] = [0,0.5]
 
 class0 = input_samples[:,0] > input_samples[:,1]
 class1 = input_samples[:,0] < input_samples[:,1]
+class_null = input_samples[:,0] == input_samples[:,1]
+
+print('Class 0 has number of samples ' + str(len(class0[class0])))
+print('Class 1 has number of samples ' + str(len(class1[class1])))
 
 plt.figure()
 plt.plot(input_samples[class0,0], input_samples[class0,1], 'bo')
@@ -148,9 +152,11 @@ S2 = Synapses(N1, N1,
                     ''',
                     method='linear')
 
-S2.connect(i=[0], j=[1])
+S2.connect(i=[0,1], j=[1,0])
 S2.w[0, 1] = -1
+S2.w[1, 0] = -1
 S2.delay[0, 1] = 0*ms
+S2.delay[1, 0] = 0*ms
 S2state  = StateMonitor(S2, ['w'], record=True)
 visualise_connectivity(S2)
 
@@ -167,10 +173,26 @@ plot_stop_ms  = plot_start_ms + 3000
 plot_start_index = plot_start_ms*10
 plot_stop_index  = plot_stop_ms*10
 
+print('Input Neuron 0 spiked ' + str(len(N0mon.spike_trains()[0]/ms)))
+print('Input Neuron 1 spiked ' + str(len(N0mon.spike_trains()[1]/ms)))
+
+print('Input spikes Neuron 0')
+print(N0mon.spike_trains()[0]/ms)
+print('Input spikes Neuron 1')
+print(N0mon.spike_trains()[1]/ms)
+
 N0mon_times_n0_plot   = N0mon.spike_trains()[0][N0mon.spike_trains()[0]/ms < plot_stop_ms]
 N0mon_times_n1_plot   = N0mon.spike_trains()[1][N0mon.spike_trains()[1]/ms < plot_stop_ms]
 N0mon_nspikes_n0_plot = np.ones(size(N0mon_times_n0_plot))*0
 N0mon_nspikes_n1_plot = np.ones(size(N0mon_times_n1_plot))*1
+
+print('Output Neuron 0 spiked ' + str(len(N1mon.spike_trains()[0]/ms)))
+print('Output Neuron 1 spiked ' + str(len(N1mon.spike_trains()[1]/ms)))
+
+print('Output spikes Neuron 0')
+print(N1mon.spike_trains()[0]/ms)
+print('Output spikes Neuron 1')
+print(N1mon.spike_trains()[1]/ms)
 
 N1mon_times_n0_plot   = N1mon.spike_trains()[0][N1mon.spike_trains()[0]/ms < plot_stop_ms]
 N1mon_nspikes_n0_plot = np.ones(size(N1mon_times_n0_plot))*2
